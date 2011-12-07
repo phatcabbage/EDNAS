@@ -1,0 +1,178 @@
+#ifndef NETWORK__IPNODE_HXX__
+#define NETWORK__IPNODE_HXX__
+
+#include <iosfwd>
+#include <map>
+#include <utility>
+
+#include "Core/Signaling/EventAdapter.h++"
+#include "Core/Signaling/SingleEvent.h++"
+#include "Logging/Logged.h++"
+
+#include "Protocols/Ethernet.h++"
+#include "Protocols/IPv4.h++"
+#include "Protocols/ARP.h++"
+#include "ARPTable.h++"
+#include "EthernetNode.h++"
+
+namespace Nodes
+{
+    using Protocols::Ethernet;
+    using Protocols::ARP;
+    using Protocols::IPv4;
+
+    struct IPNode : public Logging::Logged<IPNode>
+    {
+	IPv4::AddressType
+	Address() const
+	{ return this->Address_; }
+	
+	void
+	Address(IPv4::AddressType ip)
+	{ this->Address_ = ip; }
+
+	EthernetNode&
+	Interface()
+	{ return this->EthernetNode_; }
+
+	IPNode&
+	operator<<(IPv4::PacketPtr& pkt)
+	{ this->Send(pkt); return *this; }
+
+	void
+	Send(IPv4::PacketPtr& pkt);
+
+	SingleEvent<IPv4::PacketPtr&>&
+	operator[](IPv4::SubType type)
+	{ return this->Handlers_[type];	}
+
+	IPNode(IPv4::AddressType ip = ++G_IP,
+	       EthernetNode& node = *(new EthernetNode));
+
+	~IPNode();
+
+    protected:
+	struct SendManager;
+	
+	static Managed<IPNode>
+	G_Manager;
+
+	static IPv4::AddressType
+	G_IP;
+
+	IPv4::AddressType
+	Address_;
+
+	EthernetNode&
+	EthernetNode_;
+
+	SendManager&
+	SendManager_;
+
+	std::map<IPv4::SubType, SingleEvent<IPv4::PacketPtr&> >
+	Handlers_;
+
+	EventAdapter<IPNode,Ethernet::PacketPtr&>
+	ReceivedIPv4_;
+
+	EventAdapter<IPNode,Ethernet::PacketPtr&>
+	ReceivedARP_;
+
+	void
+	ReceivedIPv4(Ethernet::PacketPtr& f);
+	
+	void
+	ReceivedARP(Ethernet::PacketPtr& f);
+    };
+
+    struct IPNode::SendManager
+    {
+	enum ARPStatus
+	{
+	    Unknown,
+	    Requested,
+	    Known,
+	    Invalid
+	};
+
+	IPv4::AddressType
+	Gateway() const
+	{ return this->Gateway_; }
+
+	void
+	Gateway(IPv4::AddressType ip)
+	{ this->Gateway_ = ip; }
+
+	IPv4::AddressType
+	Netmask() const
+	{ return this->Netmask_; }
+
+	void
+	Netmask(IPv4::AddressType ip)
+	{ this->Netmask_ = ip; }
+
+	bool
+	IsLocal(IPv4::AddressType ip) const
+	{ return ((Node.Address_ & Netmask_) == (ip & Netmask_)); }
+	
+	void
+	Send(IPv4::PacketPtr& pkt);
+
+	void
+	UpdateARP(IPv4::AddressType ip, Ethernet::AddressType mac);
+
+	SendManager(IPNode& node,
+		    IPv4::AddressType gw,
+		    IPv4::AddressType netmask = 0xFFFFFF00)
+	    : Node(node)
+	    , Gateway_(gw)
+	    , Netmask_(netmask)
+	{}
+
+    protected:
+	IPNode& Node;
+
+	IPv4::AddressType
+	Gateway_;
+
+	IPv4::AddressType
+	Netmask_;
+
+	std::map<IPv4::AddressType, ARPStatus>
+	ARPStatuses;
+
+	std::multimap<IPv4::AddressType, Ethernet::PacketPtr>
+	AwaitingARP;
+
+	std::map<IPv4::AddressType, Ethernet::AddressType>
+	ARPTable;
+
+	void
+	SendLocal(IPv4::PacketPtr& pkt);
+
+	void
+	Send(IPv4::PacketPtr& pkt, IPv4::AddressType ip);
+	
+	void
+	SendRemote(IPv4::PacketPtr& pkt);
+
+	void
+	RequestARP(IPv4::AddressType ip);
+
+	struct ARPTimeout;
+    };
+
+    struct IPNode::SendManager::ARPTimeout
+    {
+	static const int Timeout = 15;
+	IPNode::SendManager& SendMgr_;
+	IPv4::AddressType IP;
+	ARPTimeout(IPNode::SendManager& mgr, IPv4::AddressType ip);
+	void operator()();
+    };
+
+    std::ostream&
+    operator<<(std::ostream& o, const IPNode& w);
+}
+
+#endif // NETWORK__WORKSTATION_HXX__

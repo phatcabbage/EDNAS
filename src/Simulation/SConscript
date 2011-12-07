@@ -1,0 +1,6 @@
+Import('env lib_dir cflags')
+
+env.Replace(CCFLAGS = cflags)
+
+simulation = env.Library('Simulation', Glob('*.c++'))
+env.Install(lib_dir, simulation)

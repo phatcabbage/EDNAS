@@ -1,0 +1,135 @@
+#ifndef NETWORK__WORKSTATION_HXX__
+#define NETWORK__WORKSTATION_HXX__
+
+//#include 
+
+#include <iosfwd>
+#include <map>
+#include <utility>
+
+#include "Core/Signaling/EventAdapter.h++"
+#include "Logging/Logged.h++"
+
+#include "Network/NIC.h++"
+#include "Protocols/Ethernet.h++"
+#include "Protocols/IPv4.h++"
+#include "Protocols/ARP.h++"
+#include "Protocols/ICMP.h++"
+
+namespace Nodes
+{
+    using Network::NIC;
+
+    using Protocols::Ethernet;
+    using Protocols::ARP;
+    using Protocols::IPv4;
+
+    struct IPNode;
+
+    struct ARPTable
+    {
+    private:
+	typedef std::map<IPv4::AddressType,Ethernet::AddressType> MapType;
+	
+	MapType
+	Map_;
+
+    public:
+	bool 
+	Update(IPv4::AddressType ip, Ethernet::AddressType mac)
+	{ return this->Map_.insert(std::make_pair(ip,mac)).second; }
+
+	Ethernet::AddressType
+	Resolve(IPv4::AddressType ip) const
+	{ 
+	    MapType::const_iterator it = this->Map_.find(ip);
+	    return (it == this->Map_.end()) ? 
+		Ethernet::AddressType(0) : it->second;
+	}
+	
+	ARPTable() : Map_() {}
+    };
+
+    
+    struct Workstation : public Logging::Logged<Workstation>
+    {
+	typedef ARPTable
+	ARPTableType;
+
+	typedef std::list<IPv4::PacketPtr> IPPacketQueue;
+
+	typedef std::map<IPv4::AddressType,IPPacketQueue>
+	AwaitingARPType;
+
+	const IPv4::AddressType
+	IP;
+
+	Workstation();
+	~Workstation();
+
+	NIC&
+	GetNIC()
+	{ return this->NIC_; }
+
+	Ethernet::AddressType
+	MAC() const
+	{ return this->NIC_.MAC(); }
+
+	void
+	SendPing(IPv4::AddressType ip);
+
+    protected:
+	static IPv4::AddressType
+	G_IP;
+
+	ARPTableType
+	ARPTable_;
+
+	AwaitingARPType
+	AwaitingARP_;
+
+	NIC
+	NIC_;
+
+	EventAdapter<Workstation,Ethernet::PacketPtr&>
+	NICAdapter_;
+
+	void
+	AttemptAwaiting(IPv4::AddressType ip);
+
+	void
+	Send(IPv4::PacketPtr& pkt, IPv4::AddressType ip);
+
+	void
+	Received(Ethernet::PacketPtr& f);
+	
+	void
+	Received(IPv4::PacketPtr& pkt);
+	
+	void
+	Received(ARP::PacketPtr& pkt);
+	
+	void
+	Received(ICMP::PacketPtr& pkt, IPv4::AddressType senderIP);
+
+	void
+	SendARPRequest(IPv4::AddressType ip);
+	
+	void
+	HandleARPRequest(ARP::PacketPtr& pkt);
+
+	void
+	HandleARPReply(ARP::PacketPtr& pkt);
+	
+	void
+	HandleICMPPing(ICMP::PacketPtr& pkt, IPv4::AddressType senderIP);
+	
+	void
+	HandleICMPPong(ICMP::PacketPtr& pkt, IPv4::AddressType senderIP);
+    };
+
+    std::ostream&
+    operator<<(std::ostream& o, const Workstation& w);
+}
+
+#endif // NETWORK__WORKSTATION_HXX__

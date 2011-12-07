@@ -1,0 +1,76 @@
+#ifndef NETWORK__NETWORK_HXX__
+#define NETWORK__NETWORK_HXX__
+
+#include <iosfwd>
+
+namespace Network
+{
+    template<typename _P> struct Address;
+    template<typename _P> struct Message;
+    template<typename _P> struct Link; // Should be limited to protocols that are at the link layer
+    template<typename _P> struct Node;
+    template<typename _P> struct 
+
+    struct Ethernet;
+
+    template<typename _P>
+    struct Address
+    {
+	typedef typename Address<typename _P::Parent>::Type Type;
+	enum { SIZE = typename Address<typename _P::Parent>::SIZE };
+    };
+
+    template<>
+    struct Address<Ethernet>
+    {
+	typedef unsigned int Type;
+	enum { SIZE = 48 };
+    };
+
+    template<typename _P>
+    struct Message
+    {
+	enum { HEADER_SIZE = -1 };
+	
+	const typename Address<_P>::Type Sender;
+	const typename Address<_P>::Type Receiver;
+	const DataType Size;
+
+	Message(const typename Address<_P>::Type& sender,
+		const typename Address<_P>::Type& receiver,
+		const DataType& dataSize);
+    };
+    
+    template<typename _P>
+    struct ContainedProtocols
+    {
+	enum { COUNT = 0 };
+    }
+
+    template<typename _P,
+	     typename _State>
+    struct Node
+    {
+	    
+	Node<_P::Parent>& ParentNode;
+	
+    };
+
+    template<typename _P>
+    struct Link
+    {
+	enum SendResult;
+
+	const BandwidthType&
+	Bandwidth() const
+	{ return this->Bandwidth_; }
+	    
+	const TimeType&
+	Latency() const
+	{ return this->Latency_; }
+    };
+
+    
+}
+
+#endif // NETWORK__NETWORK_HXX__

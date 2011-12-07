@@ -1,0 +1,9 @@
+Import('bin_dir cflags env lib_dir')
+
+env.Replace(CCFLAGS = cflags)
+
+libs = Split('Main Ethernet IPv4 Network ARP UDP')
+
+udpnt = env.Program('UDPNodeTest', Glob('UDPNodeTest.c++'), LIBS=libs, LIBPATH=lib_dir)
+
+env.Install(bin_dir, udpnt)

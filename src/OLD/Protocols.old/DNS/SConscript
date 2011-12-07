@@ -1,0 +1,4 @@
+Import('env bin_dir lib_dir')
+libs = 'Network'
+archdns = env.Library('ArchDNS', Glob('*.c++'), LIBS=libs, LIBPATH=lib_dir)
+env.Install(lib_dir, archdns)

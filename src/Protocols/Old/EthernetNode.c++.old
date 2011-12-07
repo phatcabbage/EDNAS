@@ -1,0 +1,28 @@
+#include "EthernetNode.h++"
+
+namespace Logging
+{
+    template<>
+    OStreamLogger
+    Logged<Nodes::EthernetNode>::
+    Logger("EthernetNode");
+}
+
+namespace Nodes
+{
+    Managed<TNode<Ethernet> >
+    TNode<Ethernet>::
+    G_Managed;
+
+
+    void
+    EthernetNode::
+    Received(Ethernet::PacketPtr& pkt)
+    {
+	Logger << "[MAC " << this->Address() << "] Received "
+	       << "packet of type " << pkt->Type << Logging::endl;
+
+	this->Handlers[pkt->Type](pkt);
+    }
+    
+}

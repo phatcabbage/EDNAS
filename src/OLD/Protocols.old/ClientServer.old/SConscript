@@ -1,0 +1,5 @@
+Import('env lib_dir')
+
+print(env['CPPPATH'])
+clientserver = env.Library('ClientServerArchitecture', Glob('*.c++'))
+Install(lib_dir, clientserver)

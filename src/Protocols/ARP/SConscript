@@ -1,0 +1,6 @@
+Import('env lib_dir cflags')
+
+env.Replace(CCFLAGS = cflags)
+
+arplib = env.Library('ARP', Glob('*.c++'))
+env.Install(lib_dir, arplib)

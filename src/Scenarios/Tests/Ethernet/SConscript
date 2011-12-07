@@ -1,0 +1,12 @@
+Import('bin_dir cflags env lib_dir')
+
+env.Replace(CCFLAGS = cflags)
+libs = Split('Main Ethernet Network')
+
+#baw = env.Program('BridgeAndWorkstationTest', 'BridgeAndWorkstationTest.c++', LIBS=libs, LIBPATH=lib_dir)
+bt = env.Program('BridgeTest', 'BridgeTest.c++',LIBS=libs, LIBPATH=lib_dir)
+et = env.Program('EthernetNodeTest', 'EthernetNodeTest.c++', LIBS=libs, LIBPATH=lib_dir)
+
+#env.Install(bin_dir, baw)
+env.Install(bin_dir, bt)
+env.Install(bin_dir, et)

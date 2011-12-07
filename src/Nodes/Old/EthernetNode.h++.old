@@ -1,0 +1,79 @@
+#ifndef NODES__ETHERNETNODE_HXX__
+#define NODES__ETHERNETNODE_HXX__
+
+#include "Core/Managed.h++"
+#include "Logging/Logged.h++"
+#include "Protocols/Ethernet.h++"
+#include "Network/NIC.h++"
+
+namespace Nodes
+{
+    using Protocols::Ethernet;
+    using Network::NIC;
+
+    struct EthernetNode : Logging::Logged<EthernetNode>
+    {
+	Ethernet::AddressType
+	Address() const
+	{ return this->NIC_.MAC(); }
+
+	NIC&
+	Interface() const
+	{ return NIC_; }
+
+	SingleEvent<Ethernet::PacketPtr&>&
+	operator[](Ethernet::SubType type)
+	{ return this->Handlers[type]; }
+
+	EthernetNode&
+	operator<<(Ethernet::PacketPtr& pkt)
+	{ pkt->Sender = this->Address(); this->NIC_.Send(pkt); return *this;}
+
+	EthernetNode(NIC& nic = *(new NIC))
+	    : NIC_(nic)
+	    , ReceivedAdapter_(*this, &EthernetNode::Received)
+	{
+	    G_Managed += this;
+	    this->Associate();
+	}
+	
+	virtual ~EthernetNode()
+	{
+	    this->Dissociate();
+	    G_Managed -= this;
+	}
+
+    protected:
+	static Managed<EthernetNode>
+	G_Managed;
+
+	EthernetNode(const EthernetNode& n); // prevent copying
+
+	NIC&
+	NIC_;
+	
+	std::map<Ethernet::SubType, 
+		 SingleEvent<Ethernet::PacketPtr&> >
+	Handlers;
+	
+	EventAdapter<EthernetNode, Ethernet::PacketPtr&>
+	ReceivedAdapter_;
+	
+	virtual void
+	Associate()
+	{
+	    this->NIC_.OnReceived += this->ReceivedAdapter_;
+	}
+
+	virtual void
+	Dissociate()
+	{
+	    this->NIC_.OnReceived -= this->ReceivedAdapter_;
+	}
+	
+	virtual void
+	Received(Ethernet::PacketPtr& pkt);
+    };
+}
+
+#endif // NODES__ETHERNETNODE_HXX__

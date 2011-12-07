@@ -1,0 +1,15 @@
+Import('bin_dir cflags env lib_dir')
+
+env.Replace(CCFLAGS = cflags)
+
+libs = Split('Main Ethernet IPv4 Network ARP TCP')
+
+tcpnt = env.Program('TCPNodeTest', 'NodeTest.c++', LIBS=libs, LIBPATH=lib_dir)
+tcpconnrt = env.Program('TCPConnectorTest', 'ConnectorTest.c++', LIBS=libs, LIBPATH=lib_dir)
+tcpconnt =  env.Program('TCPConnectionTest', 'ConnectionTest.c++', LIBS=libs, LIBPATH=lib_dir)
+congtest = env.Program('TCPCongestionTest', 'CongestionTest.c++', LIBS=libs, LIBPATH=lib_dir)
+
+env.Install(bin_dir, tcpnt)
+env.Install(bin_dir, tcpconnrt)
+env.Install(bin_dir, tcpconnt)
+env.Install(bin_dir, congtest)

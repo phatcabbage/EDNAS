@@ -1,0 +1,3 @@
+Import('env lib_dir')
+logging = env.Library('Logging', Glob('*.c++'))
+Install(lib_dir, logging)

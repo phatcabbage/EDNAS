@@ -1,0 +1,5 @@
+Import('env bin_dir lib_dir cflags')
+
+libs = Split('Foundation Core')
+pingsaplenty = env.Program('Ping', Glob('*.c++'), LIBS=libs, LIBPATH=lib_dir, CCFLAGS=cflags)
+env.Install(bin_dir, pingsaplenty)

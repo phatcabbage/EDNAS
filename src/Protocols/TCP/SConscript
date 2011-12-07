@@ -1,0 +1,8 @@
+Import('env lib_dir cflags')
+
+env.Replace(CCFLAGS = cflags)
+
+#connobj = env.Object(target='TCPConn',source=Glob('Connection/*.c++'))
+tcplib = env.Library('TCP',[Glob('*.c++'),Glob('Connection/*.c++')])
+
+env.Install(lib_dir, tcplib)

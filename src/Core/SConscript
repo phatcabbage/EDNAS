@@ -1,0 +1,6 @@
+Import('env lib_dir cflags')
+
+env.Replace(CCFLAGS = cflags)
+
+#core = env.Library('Core', Glob('*.c++'))
+#env.Install(lib_dir, core)

@@ -1,0 +1,54 @@
+#include <iostream>
+#include "./Node.h++"
+
+namespace Network
+{
+    template<typename _Node>
+    void
+    Link<_Node>::Transmit(Message<_Node>& msg)
+    {
+	std::cout << "[LINK] Transmitting message of size " << msg.Size << std::endl;
+	msg.Sender.Sent(msg);
+	msg.Receiver.Received(msg);
+    }
+
+    template<typename _Node>
+    void
+    Message<_Node>::Sent()
+    {
+	std::cout << "[MSG ] Message sent." << std::endl;
+    }
+
+    template<typename _Node>
+    void
+    Message<_Node>::Received()
+    {
+	std::cout << "[MSG ] Message received." << std::endl;
+    }
+
+    void
+    Node::Sent(Message<Node>& msg)
+    {
+	std::cout << "[NODE] Message of size " << msg.Size << " sent." <<std::endl;
+	msg.Sent();
+    }
+
+    void
+    Node::Received(Message<Node>& msg)
+    {
+	std::cout << "[NODE] Message of size " << msg.Size << " received." <<std::endl;
+	msg.Received();
+    }	
+}
+
+using namespace Network;
+
+int main(int argc, char **argv)
+{
+    Link<Node> link;
+    Node node;
+    const DataType size(5);
+    Message<Node> msg(node, node, size);
+    link.Transmit(msg);
+    return 0;
+}

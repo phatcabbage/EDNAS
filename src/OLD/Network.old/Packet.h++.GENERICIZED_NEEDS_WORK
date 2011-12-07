@@ -1,0 +1,40 @@
+#ifndef NETWORK__PACKET_HXX__
+#define NETWORK__PACKET_HXX__
+
+namespace Network
+{
+    template<typename _P>
+    struct Packet
+    {
+	typedef typename _P::SubTypeCode PacketTypeCode;
+	typedef Packet<typename P::SubType> SubPacket;
+
+	const static DataType G_Header_Size;
+
+	const Address<_P>::Type Sender;
+	const Address<_P>::Type Receiver;
+	const DataType Size;
+	const PacketTypeCode Type;
+    
+// 	SubPacket* 
+// 	Sub() const;
+// 	{ return this->Sub_;}
+
+	virtual ~Packet(){}
+    protected:
+// 	SubPacket*
+// 	Sub_;
+
+	Packet(const Address<_P>::Type sender,
+	       const Address<_P>::Type receiver,
+	       const Datatype& size,
+	       const PacketTypeCode type)
+	    : Sender(sender)
+	    , Receiver(receiver)
+	    , Size(size)
+	    , Type(type)
+	{}
+    };
+}
+    
+#endif // NETWORK__PACKET_HXX__

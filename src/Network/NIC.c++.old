@@ -1,0 +1,83 @@
+#include <cassert>
+#include "Simulation/Timer.h++"
+#include "Link/Link.h++"
+#include "NIC.h++"
+
+namespace Logging
+{
+    template<>
+    OStreamLogger
+    Logged<Network::NIC>::
+    Logger("NIC");
+}
+
+namespace Network
+{
+    NIC::
+    NIC()
+	: MAC_(Ethernet::AllocateAddress())
+	, Queue_()
+	, OnReceived()
+    {}
+
+    NIC::
+    ~NIC()
+    {
+    }
+
+    void
+    NIC::
+    Transmit()
+    {
+	if (this->Queue_.empty()) return;
+	Logger << *this << "Sending packet." << Logging::endl;
+	auto f = this->Queue_.front();
+	assert(f->Sender <= Ethernet::G_MAC || f->Sender == Ethernet::BROADCAST);
+	assert(f->Receiver <= Ethernet::G_MAC || f->Receiver == Ethernet::BROADCAST);
+	this->Handle_->Send(f);
+	new SendTimer(*this);
+    }
+
+    void
+    NIC::
+    Sent()
+    {
+	Logger << *this << "Packet sent. " << Logging::endl;
+
+	this->Queue_.pop();
+	this->Transmit();
+    }
+
+    void
+    NIC::
+    Received(Ethernet::PacketPtr& f)
+    {
+	Logger << *this << "Received packet of type "
+	       << f->Type << Logging::endl;
+	
+	this->OnReceived(f);
+    }
+
+    void
+    NIC::
+    Send(Ethernet::PacketPtr& frm)
+    {
+	Logger << *this << "Enqueuing frame." << Logging::endl;
+	bool empty = this->Queue_.empty();
+	this->Queue_.push(frm);
+	if (empty)
+	    this->Transmit();
+    }
+
+    NIC::SendTimer::
+    SendTimer(NIC& n)
+	: N(n)
+    {
+	TimeType time = (n.Queue_.front()->Size() / n.Handle_->Upstream());
+	Simulation::Timer::Main.Schedule(time, *this);
+    }
+
+    std::ostream&
+    operator<<(std::ostream& o, const NIC& n)
+    { return o << "|" << (n.MAC()) << "| "; }
+}

@@ -1,0 +1,6 @@
+Import('env lib_dir cflags')
+
+env.Replace(CCFLAGS = cflags)
+
+ethlib = env.Library('Ethernet',Glob('*.c++'))
+env.Install(lib_dir, ethlib)

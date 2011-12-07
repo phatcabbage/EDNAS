@@ -1,0 +1,8 @@
+Import('env lib_dir cflags')
+
+env.Replace(CCFLAGS = cflags)
+
+SConscript([
+	'Ethernet/SConscript',
+	'TCP/SConscript'
+	])

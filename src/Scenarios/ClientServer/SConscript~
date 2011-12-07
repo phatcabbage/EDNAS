@@ -1,0 +1,10 @@
+Import('bin_dir cflags env lib_dir')
+
+env.Replace(CCFLAGS = cflags)
+
+libs = Split('Main Ethernet IPv4 Network ARP TCP')
+
+clientserver = env.Object('ClientServer', 'ClientServer.c++')
+csmain = env.Program('ClientServer', Split('ClientServer.o main.c++'), LIBS=libs, LIBPATH=lib_dir)
+
+env.Install(bin_dir, csmain)

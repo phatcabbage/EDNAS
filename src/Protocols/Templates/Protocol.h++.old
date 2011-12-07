@@ -1,0 +1,25 @@
+#ifndef PROTOCOLS__TEMPLATES__PROTOCOL_HXX__
+#define PROTOCOLS__TEMPLATES__PROTOCOL_HXX__
+
+#include <memory>
+
+template<typename _Wrapper,
+	 typename _Wrapped,
+	 typename _Packet,
+	 typename _Address>
+struct TProtocol
+{
+    typedef _Wrapper WrapperType;
+    typedef _Wrapped WrappedType;
+    typedef _Packet  PacketType;
+    typedef _Address AddressType;
+
+    static const _Wrapper
+    
+    typedef std::shared_ptr<PacketType> PacketPtr;
+
+    static const char *Name;
+};
+    
+
+#endif

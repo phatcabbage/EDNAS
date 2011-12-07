@@ -1,0 +1,35 @@
+#ifndef PROTOCOLS__PACKET_HXX__
+#define PROTOCOLS__PACKET_HXX__
+
+#include "SEDNAS.h++"
+#include "Network/Packet.h++"
+
+namespace Protocols
+{
+    namespace Templates
+    {
+	template<typename _P>
+	struct Packet : public Network::IData
+	{
+	    typename _P::AddressType
+	    Receiver, Sender;
+	    
+	    SizeType
+	    Length;
+
+	    virtual SizeType
+	    Size() const
+	    { return Length; }
+
+	    Packet(typename _P::AddressType receiver,
+		   typename _P::AddressType sender,
+		   SizeType size)
+		: Receiver(receiver)
+		, Sender(sender)
+		, Length(size)
+	    {}
+	};
+    }
+}  
+
+#endif // PROTOCOLS__PACKET_HXX__

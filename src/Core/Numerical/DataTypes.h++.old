@@ -1,0 +1,159 @@
+#ifndef CORE__NUMERICAL__DATATYPES_HXX__
+#define CORE__NUMERICAL__DATATYPES_HXX__
+
+//#include <ostream>
+#include <iosfwd>
+
+namespace Core
+{
+    namespace Numerical
+    {
+	typedef long double RTyp;
+
+	template<int D,int T>
+	class Unit
+	{
+	private:
+	    RTyp v_;
+	public:
+	    enum
+	    {
+		DataDimension = D,
+		TimeDimension = T
+	    };
+	    
+	    explicit inline 
+	    Unit() 
+		: v_(1)   
+	    {}
+	    
+	    explicit inline 
+	    Unit(const RTyp& r) 
+		: v_(r) 
+	    {}
+
+	    inline 
+	    Unit(const Unit& u)
+		: v_(u.v_)
+	    {}
+	    
+	    inline 
+	    Unit& 
+	    operator=(const Unit& u){ v_ =  u.v_; return *this;}
+
+	    /* Arithmetic Operators */
+	    friend inline 
+	    Unit
+	    operator+(const Unit& a, const Unit& b){return Unit(a.v_ + b.v_);}
+
+	    friend inline 
+	    Unit
+	    operator-(const Unit& a, const Unit& b){return Unit(a.v_ - b.v_);}
+	    
+	    friend inline 
+	    Unit
+	    operator*(const Unit& a, const RTyp& b){return Unit(a.v_ *    b);}
+	    
+	    friend inline 
+	    Unit
+	    operator*(const RTyp& a, const Unit& b){return Unit(b.v_ *    a);}
+	    
+	    friend inline 
+	    Unit
+	    operator/(const Unit& a, const RTyp& b){return Unit(a.v_ /    b);}
+
+	    friend inline
+	    RTyp
+	    operator/(const Unit& a, const Unit& b){return RTyp(a.v_ / b.v_);}
+	    
+	    /* Shorthand Arithmetic operators */
+	    inline Unit& 
+	    operator+=(const Unit& u){ v_ += u.v_; return *this;}
+	    inline Unit& 
+	    operator-=(const Unit& u){ v_ -= u.v_; return *this;}
+	    inline Unit& 
+	    operator*=(const RTyp& a){ v_ *=    a; return *this;}
+	    inline Unit& 
+	    operator/=(const RTyp& a){ v_ /=    a; return *this;}
+
+	    /* Equality Operators */
+	    inline bool 
+	    operator==(const Unit& u) const { return (v_ == u.v_);}
+	    inline bool 
+	    operator!=(const Unit& u) const { return (v_ != u.v_);}
+	    inline bool 
+	    operator<=(const Unit& u) const { return (v_ <= u.v_);}
+	    inline bool 
+	    operator>=(const Unit& u) const { return (v_ >= u.v_);}
+	    inline bool 
+	    operator< (const Unit& u) const { return (v_ <  u.v_);}
+	    inline bool  
+	    operator> (const Unit& u) const { return (v_ >  u.v_);}
+
+	    inline bool
+	    operator==(const RTyp& r) const { return (v_ == r);}
+	    inline bool 
+	    operator!=(const RTyp& r) const { return (v_ != r);}
+	    inline bool 
+	    operator<=(const RTyp& r) const { return (v_ <= r);}
+	    inline bool 
+	    operator>=(const RTyp& r) const { return (v_ >= r);}
+	    inline bool 
+	    operator< (const RTyp& r) const { return (v_ <  r);}
+	    inline bool  
+	    operator> (const RTyp& r) const { return (v_ >  r);}
+
+
+
+	    // inline bool
+	    // IsPositive () const { return (v_ > 0);}
+
+	    // inline bool
+	    // IsNegative () const { return (v_ < 0);}
+
+	    // inline bool
+	    // IsZero     () const { return (v_ == 0);}
+
+	    /* Others */
+	    const inline RTyp& 
+	    Value() const { return v_;}
+
+	    inline RTyp&
+	    Value()       { return v_;}
+
+            friend inline
+	    std::ostream&
+            operator<<(std::ostream& o, const Unit& u) {return (o << u.v_);}
+	};
+
+	template<int Da, int Ta, int Db, int Tb>
+	inline
+	Unit<Da+Db,Ta+Tb>
+	operator*(const Unit<Da,Ta>& a, const Unit<Db,Tb>& b)
+	{ return Unit<Da+Db,Ta+Tb>(a.Value() * b.Value());}
+	
+	template<int Da, int Ta, int Db, int Tb>
+	inline
+	Unit<Da-Db,Ta-Tb>
+	operator/(const Unit<Da,Ta>& a, const Unit<Db,Tb>& b)
+	{ return Unit<Da-Db,Ta-Tb>(a.Value() / b.Value());}
+
+    } // Numerical
+} // Core
+
+#ifdef RAW_DATATYPES_
+typedef double FrequencyType;
+typedef double TimeType;
+typedef double BandwidthType;
+typedef double DataType;
+#else // RAW_DATATYPES_
+typedef Core::Numerical::Unit< 0,-1> FrequencyType;
+typedef Core::Numerical::Unit< 0, 1> TimeType;
+typedef Core::Numerical::Unit< 0, 0> UnitType;
+typedef Core::Numerical::Unit< 1,-1> BandwidthType;
+typedef Core::Numerical::Unit< 1, 0> DataType;
+
+#endif // RAW_DATATYPES_
+
+
+#endif // CORE__NUMERICAL__DATATYPES_HXX__

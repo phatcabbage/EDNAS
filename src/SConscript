@@ -1,0 +1,15 @@
+Import('include_dir lib_dir bin_dir cflags phase ldflags')
+
+cxxcompilestr = "Compiling static object $TARGET"
+ldstr = "Linking $TARGET"
+env = Environment(CCFLAGS=cflags,CPPPATH=include_dir,CXXCOMSTR=cxxcompilestr,LDMODULEFLAGS=ldflags,SHLINKFLAGS=ldflags,LINKFLAGS=ldflags)
+Export('bin_dir cflags env include_dir lib_dir phase ldflags')
+
+SConscript([
+        'Network/SConscript',
+        'Protocols/SConscript',
+        'Scenarios/SConscript',
+	])
+
+main = env.Library('Main','Main.c++')
+env.Install(lib_dir, main)

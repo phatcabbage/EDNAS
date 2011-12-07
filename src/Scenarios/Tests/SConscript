@@ -1,0 +1,34 @@
+Import('bin_dir cflags env lib_dir')
+
+env.Replace(CCFLAGS = cflags)
+#libs = Split('Simulation Network Nodes')
+
+
+SConscript([
+	 'Ethernet/SConscript'
+	,'IPv4/SConscript'
+	,'TCP/SConscript'
+	,'UDP/SConscript'
+	])
+
+#ethtest     = env.Program('EthernetNodeTest',         'EthernetNodeTest.c++',         LIBS=libs, LIBPATH=lib_dir)
+#nictest     = env.Program('NICTest', 	      	      'NICTest.c++', 		      LIBS=libs, LIBPATH=lib_dir)
+#bridgetest  = env.Program('BridgeTest',       	      'BridgeTest.c++', 	      LIBS=libs, LIBPATH=lib_dir)
+#bridgeandws = env.Program('BridgeAndWorkstationTest', 'BridgeAndWorkstationTest.c++', LIBS=libs, LIBPATH=lib_dir)
+#pinger      = env.Program('PingerTest', 	      'PingerTest.c++', 	      LIBS=libs, LIBPATH=lib_dir)
+#udp 	    = env.Program('UDPTest', 		      'UDPTest.c++', 		      LIBS=libs, LIBPATH=lib_dir)
+#dhcptest    = env.Program('DHCPTest', 		      'DHCPTest.c++', 		      LIBS=libs, LIBPATH=lib_dir)
+#tftptest    = env.Program('TFTPTest', 		      'TFTPTest.c++', 		      LIBS=libs, LIBPATH=lib_dir)
+#tftpbridge  = env.Program('TFTPAndBridgeTest', 	      'TFTPAndBridgeTest.c++', 	      LIBS=libs, LIBPATH=lib_dir)
+#tcptest	    = env.Program('TCPTest',		      'TCPTest.c++',	       	      LIBS=libs, LIBPATH=lib_dir)
+
+#env.Install(bin_dir, ethtest)
+#env.Install(bin_dir, nictest)
+#env.Install(bin_dir, bridgetest)
+#env.Install(bin_dir, bridgeandws)
+#env.Install(bin_dir, pinger)
+#env.Install(bin_dir, udp)
+#env.Install(bin_dir, dhcptest)
+#env.Install(bin_dir, tftptest)
+#env.Install(bin_dir, tftpbridge)
+#env.Install(bin_dir, tcptest)

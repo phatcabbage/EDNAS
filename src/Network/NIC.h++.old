@@ -1,0 +1,84 @@
+#ifndef NETWORK__NIC_HXX__
+#define NETWORK__NIC_HXX__
+
+#include <iosfwd>
+#include <queue>
+#include <set>
+
+#include "Core/Signaling/SingleEvent.h++"
+#include "Logging/Logged.h++"
+#include "Protocols/Ethernet.h++"
+
+namespace Links
+{
+    template<typename _Protocol>
+    struct ILinkHandle;
+}
+
+namespace Network
+{
+    using Protocols::Ethernet;
+
+    class NIC : public Logging::Logged<NIC>
+    {
+    protected:
+	Ethernet::AddressType
+	MAC_;
+
+	Links::ILinkHandle<Ethernet>*
+	Handle_;
+
+	std::queue<Ethernet::PacketPtr>
+	Queue_;
+	
+	void
+	Transmit();
+
+	void
+	Sent();
+
+	NIC(const NIC& nic); // prevent copying
+    public:
+	SingleEvent<Ethernet::PacketPtr&>
+	OnReceived;
+
+	NIC();
+
+	virtual ~NIC();
+
+	Ethernet::AddressType
+	Address() const
+	{ return this->MAC(); }
+
+	Ethernet::AddressType
+	MAC() const
+	{ return this->MAC_; }
+
+	Links::ILinkHandle<Ethernet>*
+	Handle() const
+	{ return this->Handle_;}
+
+	void
+	Handle(Links::ILinkHandle<Ethernet>* h)
+	{ this->Handle_ = h; }
+
+	void
+	Send(Ethernet::PacketPtr& frm);
+
+	void
+	Received(Ethernet::PacketPtr& f);
+	
+	struct SendTimer
+	{
+	    NIC& N;
+	    void operator()()
+	    { N.Sent(); delete this; }
+	    SendTimer(NIC& n);
+	};	    
+    };
+
+    std::ostream&
+    operator<<(std::ostream& o, const NIC& n);
+}
+
+#endif // NETWORK__NIC_HXX__

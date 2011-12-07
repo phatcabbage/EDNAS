@@ -1,0 +1,3 @@
+Import('env lib_dir')
+numerical = env.Library('Numerical', Glob('*.c++'))
+env.Install(lib_dir, numerical)

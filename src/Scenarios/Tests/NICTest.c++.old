@@ -1,0 +1,23 @@
+#include <cstdlib>
+#include <ctime>
+#include "Simulation/Timer.h++"
+#include "Link/LossyPointToPoint.h++"
+#include "Network/NIC.h++"
+
+using namespace Network;
+using Protocols::Ethernet;
+
+using namespace Links;
+
+int main(int argc, char** argv)
+{
+    NIC nicA, nicB;
+    srandom(time(NULL));
+    LossyPointToPointLink<Ethernet> link(1);
+    link.Connect(nicA, nicB);
+    std::shared_ptr<void> voidptr((void*)0);
+    Ethernet::PacketPtr msg(new Ethernet::PacketType(Ethernet::IPv4, voidptr, 16384, nicA.MAC(), nicB.MAC()));
+    nicA.Send(msg);
+    Simulation::Timer::Main.Run();
+    return 0;
+}

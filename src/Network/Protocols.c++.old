@@ -1,0 +1,67 @@
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include "SEDNAS.h++"
+#include "Protocols/Ethernet.h++"
+#include "Protocols/DHCP.h++"
+#include "Protocols/IPv4.h++"
+#include "Protocols/TFTP.h++"
+#include "Protocols/Echo.h++"
+
+namespace Protocols
+{
+    const IPv4::SubType	TCP::TypeCode;
+
+    const TCP::Port	TCP::MIN_UNPRIVILEGED_PORT	= 1025;
+    const TCP::Port	TCP::MAX_PORT			= 65536;
+    const SizeType	TCP::DEFAULT_WINDOW;
+    const SizeType	TCP::Packet::HEADER_SIZE;
+
+    const UDP::Port	UDP::MIN_UNPRIVILEGED_PORT	= 1024;
+    const UDP::Port	UDP::MAX_PORT			= 65536;
+
+    const UDP::Port	DHCP::ServerPort		= 67;
+    const UDP::Port	DHCP::ClientPort		= 68;
+
+    template<>
+    const TCP::SubType	TCPEcho::TypeCode;
+    template<>
+    const TCP::Port	TCPEcho::ServerPort		= 7;
+    
+    const IPv4::SubType	UDP::TypeCode;
+    
+    template<>
+    const UDP::SubType	UDPEcho::TypeCode;
+    template<>
+    const UDP::Port	UDPEcho::ServerPort		= 7;
+
+    const UDP::Port	TFTP::ServerPort		= 69;
+
+    DHCP::Packet::TransactionID
+    DHCP::Packet::G_Transaction_ID = 0;
+
+    const TimeType
+    TFTP::TIMEOUT;
+
+    const SizeType
+    TFTP::MAX_DATA;
+}
+
+std::ostream&
+operator<<(std::ostream& o, const Protocols::TCP::Port& port)
+{
+    return o << port.Value;
+}
+
+std::ostream&
+operator<<(std::ostream& o, const Protocols::TCP::Socket& sock)
+{
+    return o << sock.IP << ":" << sock.Port;
+}
+
+std::ostream&
+operator<<(std::ostream& o, const Protocols::UDP::Port& port)
+{
+    return o << port.Value;
+}

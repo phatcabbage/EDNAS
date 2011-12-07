@@ -1,0 +1,4 @@
+Import('env bin_dir lib_dir cflags')
+libs = Split('Core Foundation')
+webserver = env.Program('Webserver', Glob('*.c++'), LIBS=libs, LIBPATH=lib_dir,CCFLAGS=cflags)
+Install(bin_dir, webserver)

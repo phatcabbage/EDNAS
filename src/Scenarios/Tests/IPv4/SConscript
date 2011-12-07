@@ -1,0 +1,10 @@
+Import('bin_dir cflags env lib_dir')
+
+env.Replace(CCFLAGS = cflags)
+
+libs = Split('Main Ethernet IPv4 Network ARP')
+
+ipv4nt = env.Program('IPNodeTest', Glob('NodeTest.c++'), LIBS=libs, LIBPATH=lib_dir)
+ipv4rt = env.Program('IPRouterTest', Glob('RouterTest.c++'), LIBS=libs, LIBPATH=lib_dir)
+env.Install(bin_dir, ipv4nt)
+env.Install(bin_dir, ipv4rt)

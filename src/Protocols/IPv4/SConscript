@@ -1,0 +1,7 @@
+Import('env lib_dir cflags')
+
+env.Replace(CCFLAGS = cflags)
+
+ip4lib = env.Library('IPv4',Glob('*.c++'))
+
+env.Install(lib_dir, ip4lib)

@@ -1,0 +1,7 @@
+Import('env lib_dir cflags')
+
+env.Replace(CCFLAGS = cflags)
+
+tcpnode = env.Library('TCPNode', Glob('*.c++'))
+
+env.Install(lib_dir, tcpnode)

@@ -1,0 +1,4 @@
+Import('env bin_dir lib_dir')
+libs = 'Network'
+archping = env.Library('ArchPing', Glob('*.c++'), LIBS=libs, LIBPATH=lib_dir)
+env.Install(lib_dir, archping)
